@@ -7,25 +7,27 @@ Features:
 
 Launch: python frontend/gradio_app.py
 """
+
 from __future__ import annotations
 
 import asyncio
 import shutil
+import sys
 import uuid
 from pathlib import Path
+
 import gradio as gr
-import sys
 
 # Ensure project root is on sys.path so top-level packages import when running script directly
 project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from services.validation_service import sanitize_filename
 from core.config import get_settings
 from core.logger import get_logger
-from services.transcription_service import transcription_service
 from models.model_registry import registry
+from services.transcription_service import transcription_service
+from services.validation_service import sanitize_filename
 
 settings = get_settings()
 logger = get_logger()
@@ -49,7 +51,9 @@ def _transcribe_local(audio_path: str, model_name: str | None = None) -> str:
 
     try:
         # transcription_service.transcribe_file is async
-        result = asyncio.run(transcription_service.transcribe_file(dest, model_name=model_name))
+        result = asyncio.run(
+            transcription_service.transcribe_file(dest, model_name=model_name)
+        )
         return result.get("text", "")
     except Exception as exc:
         logger.exception("Gradio transcription failed")
@@ -57,10 +61,14 @@ def _transcribe_local(audio_path: str, model_name: str | None = None) -> str:
 
 
 def _get_models() -> list[str]:
-    defaults = [settings.model_name, "openai/whisper-base", "distil-whisper/distil-small.en"]
+    defaults = [
+        settings.model_name,
+        "openai/whisper-base",
+        "distil-whisper/distil-small.en",
+    ]
     known = registry.list_models()
     seen: list[str] = []
-    for m in (known + defaults):
+    for m in known + defaults:
         if m and m not in seen:
             seen.append(m)
     return seen
@@ -71,14 +79,22 @@ def main() -> None:
         gr.Markdown("# Voice-to-Text (Gradio Demo)")
         with gr.Row():
             with gr.Column(scale=1):
-                audio_input = gr.Audio(sources=["upload", "microphone"], type="filepath", label="Upload or record audio")
-                model_dropdown = gr.Dropdown(choices=_get_models(), value=settings.model_name, label="Model")
+                audio_input = gr.Audio(
+                    sources=["upload", "microphone"],
+                    type="filepath",
+                    label="Upload or record audio",
+                )
+                model_dropdown = gr.Dropdown(
+                    choices=_get_models(), value=settings.model_name, label="Model"
+                )
                 transcribe_btn = gr.Button("Transcribe")
             with gr.Column(scale=2):
                 output_text = gr.Textbox(label="Transcription", lines=10)
                 # gr.File triggers a gradio_client schema bug (bool not iterable).
                 # Use a plain Textbox to surface the saved filepath instead.
-                transcript_path = gr.Textbox(label="Saved transcript path", interactive=False)
+                transcript_path = gr.Textbox(
+                    label="Saved transcript path", interactive=False
+                )
 
         def _on_transcribe(audio, model):
             text = _transcribe_local(audio, model)

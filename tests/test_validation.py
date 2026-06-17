@@ -7,7 +7,9 @@ from core.exceptions import ValidationError
 def test_sanitize_filename_basic():
     assert vs.sanitize_filename("my file.wav") == "my_file.wav"
     assert vs.sanitize_filename("../etc/passwd") == "passwd"
-    assert vs.sanitize_filename(".hidden.mp3").startswith("hidden") and vs.sanitize_filename(".hidden.mp3").endswith(".mp3")
+    assert vs.sanitize_filename(".hidden.mp3").startswith(
+        "hidden"
+    ) and vs.sanitize_filename(".hidden.mp3").endswith(".mp3")
     longfn = "a" * 250 + ".wav"
     s = vs.sanitize_filename(longfn)
     assert len(s) <= 200

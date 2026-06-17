@@ -2,16 +2,17 @@
 
 Provides simple, testable checks for file existence, size, extension, and optional integrity check.
 """
+
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Union
-import re
 
 from core.config import get_settings
 from core.constants import SUPPORTED_AUDIO_EXTENSIONS
-from core.logger import get_logger
 from core.exceptions import ValidationError
+from core.logger import get_logger
 
 settings = get_settings()
 logger = get_logger()
@@ -42,7 +43,9 @@ def sanitize_filename(filename: str) -> str:
     return name
 
 
-def validate_file_path(file_path: Union[str, Path], check_integrity: bool = True) -> None:
+def validate_file_path(
+    file_path: Union[str, Path], check_integrity: bool = True
+) -> None:
     """Validate an uploaded file path.
 
     Raises ValidationError if the file is missing, empty, too large, has an unsupported
@@ -58,7 +61,9 @@ def validate_file_path(file_path: Union[str, Path], check_integrity: bool = True
     if size == 0:
         raise ValidationError("Empty file")
     if size > settings.max_file_size:
-        raise ValidationError(f"File exceeds maximum size ({settings.max_file_size} bytes)")
+        raise ValidationError(
+            f"File exceeds maximum size ({settings.max_file_size} bytes)"
+        )
 
     if p.suffix.lower() not in SUPPORTED_AUDIO_EXTENSIONS:
         raise ValidationError(f"Unsupported file extension: {p.suffix}")

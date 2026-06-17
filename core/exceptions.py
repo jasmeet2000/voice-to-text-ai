@@ -1,5 +1,6 @@
 """Application-specific exceptions used across the project."""
 
+
 class ApplicationError(Exception):
     """Base class for application-specific errors."""
 

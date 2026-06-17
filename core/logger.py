@@ -2,14 +2,15 @@
 
 Creates rotating sinks under configured log_dir and exposes the logger.
 """
+
 from __future__ import annotations
 
 import sys
 from pathlib import Path
+
 from loguru import logger
 
 from .config import get_settings
-
 
 settings = get_settings()
 

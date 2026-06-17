@@ -2,19 +2,19 @@
 
 This layer keeps business logic separate from FastAPI routes and the model implementation.
 """
+
 from __future__ import annotations
 
 import asyncio
-from time import perf_counter
 from pathlib import Path
-from typing import Union, Optional, Dict, Any
+from time import perf_counter
+from typing import Any, Dict, Optional, Union
 
 from core.config import get_settings
-from core.logger import get_logger
 from core.exceptions import TranscriptionError
-
-from services.validation_service import validate_file_path
+from core.logger import get_logger
 from services.audio_service import convert_to_wav
+from services.validation_service import validate_file_path
 
 settings = get_settings()
 logger = get_logger()
@@ -36,11 +36,18 @@ class TranscriptionService:
 
                 self._registry = model_registry
             except Exception as exc:  # pragma: no cover - runtime dependency
-                logger.debug("Model registry not available in TranscriptionService: %s", exc)
+                logger.debug(
+                    "Model registry not available in TranscriptionService: %s", exc
+                )
                 self._registry = None
         return self._registry
 
-    async def transcribe_file(self, file_path: Union[str, Path], model_name: Optional[str] = None, timeout: Optional[float] = None) -> Dict[str, Any]:
+    async def transcribe_file(
+        self,
+        file_path: Union[str, Path],
+        model_name: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Dict[str, Any]:
         """Validate, preprocess, run inference, and format the transcription result.
 
         - file_path: path to uploaded file
@@ -77,11 +84,18 @@ class TranscriptionService:
             duration = perf_counter() - start
 
             # Normalize result (supports TranscriptionResult dataclass from model layer)
-            text = getattr(result, "text", None) or (result.raw.get("text") if getattr(result, "raw", None) else "")
+            text = getattr(result, "text", None) or (
+                result.raw.get("text") if getattr(result, "raw", None) else ""
+            )
             segments = getattr(result, "segments", None)
             language = getattr(result, "language", None)
 
-            logger.info("Transcription completed in %.2fs for %s using model %s", duration, p.name, model_name or settings.model_name)
+            logger.info(
+                "Transcription completed in %.2fs for %s using model %s",
+                duration,
+                p.name,
+                model_name or settings.model_name,
+            )
 
             return {
                 "text": text,
@@ -102,7 +116,10 @@ class TranscriptionService:
                 if wav_path and wav_path.exists():
                     try:
                         upload_dir_resolved = Path(settings.upload_dir).resolve()
-                        if wav_path.resolve().parent == upload_dir_resolved and wav_path.resolve() != Path(p).resolve():
+                        if (
+                            wav_path.resolve().parent == upload_dir_resolved
+                            and wav_path.resolve() != Path(p).resolve()
+                        ):
                             wav_path.unlink(missing_ok=True)
                             logger.debug("Removed temporary wav %s", wav_path)
                     except Exception:

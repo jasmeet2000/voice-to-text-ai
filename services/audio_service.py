@@ -3,17 +3,18 @@
 Functions are intentionally small and blocking; callers should run them in a threadpool
 when used from async code (e.g., asyncio.to_thread).
 """
+
 from __future__ import annotations
 
 import os
 import shutil
-from pathlib import Path
-from typing import Union, Optional
 import uuid
+from pathlib import Path
+from typing import Optional, Union
 
 from core.config import get_settings
-from core.logger import get_logger
 from core.exceptions import ValidationError
+from core.logger import get_logger
 
 settings = get_settings()
 logger = get_logger()
@@ -47,7 +48,11 @@ def _configure_ffmpeg() -> None:
 _configure_ffmpeg()
 
 
-def convert_to_wav(input_path: Union[str, Path], output_path: Optional[Union[str, Path]] = None, sample_rate: Optional[int] = None) -> Path:
+def convert_to_wav(
+    input_path: Union[str, Path],
+    output_path: Optional[Union[str, Path]] = None,
+    sample_rate: Optional[int] = None,
+) -> Path:
     """Convert arbitrary input audio to a mono WAV file at the target sample rate.
 
     Returns the path to the created WAV file. If output_path is not provided a temporary
@@ -82,7 +87,9 @@ def convert_to_wav(input_path: Union[str, Path], output_path: Optional[Union[str
         waveform, sr = torchaudio.load(str(p))
         sr = int(sr)
         if sr != int(sample_rate):
-            resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=int(sample_rate))
+            resampler = torchaudio.transforms.Resample(
+                orig_freq=sr, new_freq=int(sample_rate)
+            )
             waveform = resampler(waveform)
         torchaudio.save(str(out), waveform, int(sample_rate))
         logger.debug("Converted via torchaudio %s -> %s (sr=%s)", p, out, sample_rate)

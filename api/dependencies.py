@@ -2,10 +2,11 @@
 
 Note: model and service imports are lazy to avoid heavy ML deps at import time.
 """
+
 from __future__ import annotations
 
 from importlib import import_module
-from typing import Optional, Any
+from typing import Any, Optional
 
 from core.config import get_settings
 from core.logger import get_logger

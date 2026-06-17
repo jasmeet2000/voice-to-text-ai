@@ -2,6 +2,7 @@
 
 Provides a thin registry and convenience helpers for synchronous and async transcription calls.
 """
+
 from __future__ import annotations
 
 import threading
@@ -10,7 +11,7 @@ from typing import Dict, List, Optional
 from core.config import get_settings
 from core.logger import get_logger
 
-from .whisper_model import WhisperModel, TranscriptionResult
+from .whisper_model import TranscriptionResult, WhisperModel
 
 logger = get_logger()
 settings = get_settings()
@@ -22,7 +23,9 @@ class ModelRegistry:
     Models are lazily created on first access. The registry is thread-safe.
     """
 
-    def __init__(self, default_model: Optional[str] = None, device: Optional[str] = None):
+    def __init__(
+        self, default_model: Optional[str] = None, device: Optional[str] = None
+    ):
         self.default_model = default_model or settings.model_name
         self.device = device or settings.device
         self._models: Dict[str, WhisperModel] = {}
@@ -48,11 +51,15 @@ class ModelRegistry:
     def list_models(self) -> List[str]:
         return list(self._models.keys())
 
-    def transcribe(self, audio, model_name: Optional[str] = None, **kwargs) -> TranscriptionResult:
+    def transcribe(
+        self, audio, model_name: Optional[str] = None, **kwargs
+    ) -> TranscriptionResult:
         model = self.get(model_name)
         return model.transcribe(audio, **kwargs)
 
-    async def atranscribe(self, audio, model_name: Optional[str] = None, **kwargs) -> TranscriptionResult:
+    async def atranscribe(
+        self, audio, model_name: Optional[str] = None, **kwargs
+    ) -> TranscriptionResult:
         model = self.get(model_name)
         return await model.atranscribe(audio, **kwargs)
 

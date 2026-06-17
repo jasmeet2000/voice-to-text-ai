@@ -1,4 +1,5 @@
 """Constants for audio handling and default parameters."""
+
 from __future__ import annotations
 
 from typing import Set

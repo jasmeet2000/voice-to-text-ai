@@ -1,29 +1,30 @@
 """FastAPI routes for the voice-to-text service."""
+
 from __future__ import annotations
 
 import shutil
 import uuid
 from pathlib import Path
-from typing import List, Any, Optional
+from typing import Any, List, Optional
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
-from api.schemas import (
-    HealthResponse,
-    UploadResponse,
-    TranscriptionRequest,
-    TranscriptionResponse,
-    ModelInfo,
-)
 from api.dependencies import (
-    get_settings_dep,
-    get_registry_dep,
     get_logger_dep,
+    get_registry_dep,
+    get_settings_dep,
     get_transcription_service_dep,
 )
-from core.exceptions import ValidationError, TranscriptionError
-from services.validation_service import validate_file_path, sanitize_filename
+from api.schemas import (
+    HealthResponse,
+    ModelInfo,
+    TranscriptionRequest,
+    TranscriptionResponse,
+    UploadResponse,
+)
+from core.exceptions import TranscriptionError, ValidationError
+from services.validation_service import sanitize_filename, validate_file_path
 
 settings = get_settings_dep()
 logger = get_logger_dep()
@@ -65,7 +66,10 @@ async def upload_file(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="Invalid upload path")
     except AttributeError:
         # Older pathlib fallback
-        if upload_dir.resolve() not in dest.resolve().parents and dest.resolve() != upload_dir.resolve():
+        if (
+            upload_dir.resolve() not in dest.resolve().parents
+            and dest.resolve() != upload_dir.resolve()
+        ):
             dest.unlink(missing_ok=True)
             raise HTTPException(status_code=400, detail="Invalid upload path")
 
@@ -80,11 +84,16 @@ async def upload_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=str(exc))
 
     logger.info("Uploaded file %s (%s bytes)", dest.name, dest.stat().st_size)
-    return UploadResponse(filename=dest.name, size=dest.stat().st_size, message="Uploaded")
+    return UploadResponse(
+        filename=dest.name, size=dest.stat().st_size, message="Uploaded"
+    )
 
 
 @app.post("/transcribe", response_model=TranscriptionResponse)
-async def transcribe(req: TranscriptionRequest, transcription_service: Any = Depends(get_transcription_service_dep)):
+async def transcribe(
+    req: TranscriptionRequest,
+    transcription_service: Any = Depends(get_transcription_service_dep),
+):
     if transcription_service is None:
         raise HTTPException(status_code=503, detail="Transcription service unavailable")
 
@@ -105,7 +114,9 @@ async def transcribe(req: TranscriptionRequest, transcription_service: Any = Dep
 
     # Delegate to service (transcription_service will validate file)
     try:
-        result = await transcription_service.transcribe_file(file_path, model_name=req.model, timeout=req.timeout)
+        result = await transcription_service.transcribe_file(
+            file_path, model_name=req.model, timeout=req.timeout
+        )
         return TranscriptionResponse(**result)
     except TranscriptionError as exc:
         logger.error("TranscriptionError: %s", exc)
@@ -120,7 +131,12 @@ async def list_models(registry: Optional[Any] = Depends(get_registry_dep)):
     if registry is None:
         return []
     models = registry.list_models()
-    infos = [ModelInfo(name=name, loaded=(getattr(registry.get(name), "_pipe", None) is not None)) for name in models]
+    infos = [
+        ModelInfo(
+            name=name, loaded=(getattr(registry.get(name), "_pipe", None) is not None)
+        )
+        for name in models
+    ]
     return infos
 
 

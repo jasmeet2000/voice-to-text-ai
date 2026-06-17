@@ -1,6 +1,6 @@
+import io
 import sys
 import types
-import io
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -95,15 +95,26 @@ def test_transcribe_endpoint(monkeypatch):
     fake = _make_fake_registry_module()
     monkeypatch.setitem(sys.modules, "models.model_registry", fake)
 
-    from api import routes
-    from api.dependencies import get_transcription_service_dep
     from types import SimpleNamespace
 
+    from api import routes
+    from api.dependencies import get_transcription_service_dep
+
     async def fake_transcribe_file(filename, model_name=None, timeout=None):
-        return {"text": "hello", "segments": None, "language": "en", "model": model_name or "default", "duration": 0.1}
+        return {
+            "text": "hello",
+            "segments": None,
+            "language": "en",
+            "model": model_name or "default",
+            "duration": 0.1,
+        }
 
     # Override dependency to provide a fake transcription service
-    routes.app.dependency_overrides[get_transcription_service_dep] = lambda: SimpleNamespace(transcribe_file=fake_transcribe_file, atranscribe=fake_transcribe_file)
+    routes.app.dependency_overrides[get_transcription_service_dep] = (
+        lambda: SimpleNamespace(
+            transcribe_file=fake_transcribe_file, atranscribe=fake_transcribe_file
+        )
+    )
 
     client = TestClient(routes.app)
     r = client.post("/transcribe", json={"filename": "test.wav"})
