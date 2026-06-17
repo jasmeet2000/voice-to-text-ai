@@ -2,6 +2,7 @@
 
 https://jasmeet2000-voice-to-text-ai-frontendstreamlit-app-8xfcrg.streamlit.app/
 
+![App Demo](docs/screenshots/voice-to-text.png)
 
 # Voice-to-Text App
 
