@@ -1,0 +1,28 @@
+# Core
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+loguru
+
+# ML
+transformers
+torch
+torchaudio
+
+# Audio handling
+pydub
+ffmpeg-python
+soundfile
+librosa
+
+# Frontend / demos
+gradio
+streamlit
+
+# Testing
+pytest
+httpx
+pytest-asyncio
+
+# Dev: pin exact versions before production

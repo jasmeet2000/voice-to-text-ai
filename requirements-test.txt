@@ -1,0 +1,8 @@
+fastapi
+pytest
+httpx
+pytest-asyncio
+python-dotenv
+loguru
+pre-commit
+coverage
