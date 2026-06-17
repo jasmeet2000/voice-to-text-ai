@@ -36,4 +36,3 @@ Developer notes
 - Use dependency injection to stub or mock heavy components in tests.
 - Keep files small and focused for easier review and token efficiency.
 - Move heavy model serving to a separate process or container when scaling.
-

@@ -18,4 +18,3 @@ Usage
 Placeholders
 - Add architecture diagram: docs/architecture_diagram.svg
 - Add screenshots: docs/screenshots/
-
