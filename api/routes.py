@@ -24,7 +24,6 @@ from api.dependencies import (
 )
 from core.exceptions import ValidationError, TranscriptionError
 from services.validation_service import validate_file_path, sanitize_filename
-from core.config import get_settings
 
 settings = get_settings_dep()
 logger = get_logger_dep()

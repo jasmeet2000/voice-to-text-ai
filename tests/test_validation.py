@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 
 import services.validation_service as vs
 from core.exceptions import ValidationError

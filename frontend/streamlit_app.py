@@ -9,7 +9,6 @@ Launch: streamlit run frontend/streamlit_app.py
 from __future__ import annotations
 
 import asyncio
-import shutil
 import uuid
 import platform
 from pathlib import Path
@@ -25,7 +24,6 @@ from services.validation_service import sanitize_filename
 from core.config import get_settings
 from core.logger import get_logger
 from services.transcription_service import transcription_service
-from models.model_registry import registry
 
 settings = get_settings()
 logger = get_logger()

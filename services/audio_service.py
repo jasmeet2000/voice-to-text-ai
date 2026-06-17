@@ -78,7 +78,6 @@ def convert_to_wav(input_path: Union[str, Path], output_path: Optional[Union[str
     # Fallback: torchaudio if available
     try:
         import torchaudio
-        import torch
 
         waveform, sr = torchaudio.load(str(p))
         sr = int(sr)

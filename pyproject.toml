@@ -12,3 +12,6 @@ known_third_party = ["fastapi", "pydantic", "loguru", "transformers", "torch", "
 line-length = 88
 target-version = "py311"
 exclude = ["logs", "uploads", ".venv", "venv", "dist", "build"]
+
+[tool.ruff.lint]
+ignore = ["E402"]
